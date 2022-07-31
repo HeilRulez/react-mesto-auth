@@ -5,6 +5,9 @@
 
 @import url(./blocks/header/header.css);
 @import url(./blocks/header/__logo/headr__logo.css);
+@import url(./blocks/header/__text/header__text.css);
+@import url(./blocks/header/__btn/header__btn.css);
+@import url(./blocks/header/__link/header__link.css);
 
 @import url(./blocks/profile/profile.css);
 @import url(./blocks/profile/__avatar/profile__avatar.css);
@@ -38,11 +41,13 @@
 
 @import url(./blocks/modal-form/modal-form.css);
 @import url(./blocks/modal-form/_for/modal-form_for_view.css);
+@import url(./blocks/modal-form/_for/modal-form_for_delCard.css);
+@import url(./blocks/modal-form/_for/modal-form_for_info.css);
 @import url(./blocks/modal-form/__title/modal-form__title.css);
 @import url(./blocks/modal-form/__title/_for/modal-form__title_for_view.css);
 @import url(./blocks/modal-form/__view-img/modal-form__view-img.css);
 @import url(./blocks/modal-form/__close/modal-form__close.css);
-@import url(./blocks/modal-form/_for/modal-form_for_delCard.css);
+@import url(./blocks/modal-form/__image/modal-form__image.css);
 
 @import url(./blocks/form/form.css);
 @import url(./blocks/form/__name/form__name.css);
@@ -50,4 +55,11 @@
 @import url(./blocks/form/__btn-submit/form__btn-submit.css);
 @import url(./blocks/form/__btn-submit/_disabled/form__btn-submit_disabled.css);
 @import url(./blocks/form/__text-error/form__text-error.css);
+@import url(./blocks/form/__text/form__text.css);
+@import url(./blocks/form/__link/form__link.css);
 @import url(./blocks/border-invalid/border-invalid.css);
+
+@import url(./blocks/access-form/access-form.css);
+@import url(./blocks/access-form/__title/access-form__title.css);
+@import url(./blocks/form/__access-input/form__access-input.css);
+@import url(./blocks/form/__access-btn-submit/form__access-btn-submit.css);

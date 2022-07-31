@@ -1,0 +1,15 @@
+.header__btn {
+  background-color: rgba(0, 0, 0, 0);
+  color: #A9A9A9;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: right;
+  transition: opacity .3s ease-in-out;
+}
+
+.header__btn:hover {
+  opacity: .6;
+}

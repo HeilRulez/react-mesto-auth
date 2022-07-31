@@ -1,9 +1,8 @@
-import * as cs from './constants.js';
+import {configApi} from './constants.js';
 
 class Api {
-  constructor({baseUrl, token, type, cohort}) {
+  constructor({baseUrl, type, cohort}) {
     this._baseUrl = baseUrl;
-    this._token = token;
     this._type = type;
     this._cohort = cohort;
   }
@@ -16,40 +15,54 @@ class Api {
     }
   }
 
-  renderAllCards() {
-    return fetch(`${this._baseUrl}${this._cohort}/cards`, {
+  access(email, password, url) {
+    return fetch(`${this._baseUrl}${url}`, {
+        method: 'POST',
         headers: {
-          authorization: this._token
+          "Content-Type": this._type,
+        },
+        body: JSON.stringify({
+          "password": password,
+          "email": email
+        })
+      })
+      .then(res => this._checkResponse(res))
+    }
+
+  renderAllCards() {
+    return fetch(`${this._baseUrl}/cards`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
         }
       })
       .then(res => this._checkResponse(res))
   }
 
   getUserInfo() {
-    return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
+    return fetch(`${this._baseUrl}/users/me`, {
         headers: {
-          authorization: this._token
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
         }
       })
       .then(res => this._checkResponse(res))
   }
 
   reqDelCard(idCard) {
-    return fetch(`${this._baseUrl}${this._cohort}/cards/${idCard}`, {
+    return fetch(`${this._baseUrl}/cards/${idCard}`, {
         method: 'DELETE',
         headers: {
-          authorization: this._token
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
         }
       })
       .then(res => this._checkResponse(res))
   }
 
-  getAllCards({name, link
+  addCards({name, link
   }) {
-    return fetch(`${this._baseUrl}${this._cohort}/cards`, {
+    return fetch(`${this._baseUrl}/cards`, {
         method: 'POST',
         headers: {
-          authorization: this._token,
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -62,18 +75,18 @@ class Api {
 
   handleLike(id, isLiked) {
     if (!isLiked) {
-      return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
+      return fetch(`${this._baseUrl}/cards/${id}/likes`, {
           method: 'DELETE',
           headers: {
-            authorization: this._token
+            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
           }
         })
         .then(res => this._checkResponse(res))
     } else {
-      return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
+      return fetch(`${this._baseUrl}/cards/${id}/likes`, {
           method: 'PUT',
           headers: {
-            authorization: this._token
+            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
           }
         })
         .then(res => this._checkResponse(res))
@@ -81,10 +94,10 @@ class Api {
   }
 
   sendData(name, about) {
-    return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
+    return fetch(`${this._baseUrl}/users/me`, {
         method: 'PATCH',
         headers: {
-          authorization: this._token,
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -96,10 +109,10 @@ class Api {
   }
 
   selectionAvatar(link) {
-    return fetch(`${this._baseUrl}${this._cohort}/users/me/avatar`, {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
         method: 'PATCH',
         headers: {
-          authorization: this._token,
+          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -111,4 +124,4 @@ class Api {
 
 }
 
-export default new Api(cs.configApi);
+export default new Api(configApi);
