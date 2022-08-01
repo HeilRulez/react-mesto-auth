@@ -30,7 +30,6 @@ export default function Register({onRegister}) {
         resetForm();
         history.push('/signin');
     })
-    .catch(err => console.error(`Ошибка ${err} при регистрации.`));
   }
 
     return (

@@ -1,8 +1,9 @@
-import {configApi} from './constants.js';
+import * as cs from './constants.js';
 
 class Api {
-  constructor({baseUrl, type, cohort}) {
+  constructor({baseUrl, authUrl, type, cohort}) {
     this._baseUrl = baseUrl;
+    this._authUrl = authUrl;
     this._type = type;
     this._cohort = cohort;
   }
@@ -15,54 +16,40 @@ class Api {
     }
   }
 
-  access(email, password, url) {
-    return fetch(`${this._baseUrl}${url}`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": this._type,
-        },
-        body: JSON.stringify({
-          "password": password,
-          "email": email
-        })
-      })
-      .then(res => this._checkResponse(res))
-    }
-
   renderAllCards() {
-    return fetch(`${this._baseUrl}/cards`, {
+    return fetch(`${this._baseUrl}${this._cohort}/cards`, {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+          authorization: localStorage.getItem('jwt')
         }
       })
       .then(res => this._checkResponse(res))
   }
 
   getUserInfo() {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+          authorization: localStorage.getItem('jwt')
         }
       })
       .then(res => this._checkResponse(res))
   }
 
   reqDelCard(idCard) {
-    return fetch(`${this._baseUrl}/cards/${idCard}`, {
+    return fetch(`${this._baseUrl}${this._cohort}/cards/${idCard}`, {
         method: 'DELETE',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+          authorization: localStorage.getItem('jwt')
         }
       })
       .then(res => this._checkResponse(res))
   }
 
-  addCards({name, link
+  getAllCards({name, link
   }) {
-    return fetch(`${this._baseUrl}/cards`, {
+    return fetch(`${this._baseUrl}${this._cohort}/cards`, {
         method: 'POST',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
+          authorization: localStorage.getItem('jwt'),
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -75,18 +62,18 @@ class Api {
 
   handleLike(id, isLiked) {
     if (!isLiked) {
-      return fetch(`${this._baseUrl}/cards/${id}/likes`, {
+      return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
           method: 'DELETE',
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+            authorization: localStorage.getItem('jwt')
           }
         })
         .then(res => this._checkResponse(res))
     } else {
-      return fetch(`${this._baseUrl}/cards/${id}/likes`, {
+      return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
           method: 'PUT',
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem('jwt')}`
+            authorization: localStorage.getItem('jwt')
           }
         })
         .then(res => this._checkResponse(res))
@@ -94,10 +81,10 @@ class Api {
   }
 
   sendData(name, about) {
-    return fetch(`${this._baseUrl}/users/me`, {
+    return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
         method: 'PATCH',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
+          authorization: localStorage.getItem('jwt'),
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -109,10 +96,10 @@ class Api {
   }
 
   selectionAvatar(link) {
-    return fetch(`${this._baseUrl}/users/me/avatar`, {
+    return fetch(`${this._baseUrl}${this._cohort}/users/me/avatar`, {
         method: 'PATCH',
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwt')}`,
+          authorization: localStorage.getItem('jwt'),
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -122,6 +109,31 @@ class Api {
       .then(res => this._checkResponse(res))
   }
 
+  access(email, password, url) {
+    return fetch(`${this._authUrl}${url}`, {
+        method: 'POST',
+        headers: {
+          "Content-Type": this._type,
+        },
+        body: JSON.stringify({
+          "password": password,
+          "email": email
+        })
+      })
+      .then(res => this._checkResponse(res))
+    }
+
+    getCheckToken() {
+      return fetch(`${this._authUrl}/users/me`, {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization" : `Bearer ${localStorage.getItem('jwt')}`
+        }
+      })
+      .then(res => this._checkResponse(res))
+    }
+
 }
 
-export default new Api(configApi);
+export default new Api(cs.configApi);

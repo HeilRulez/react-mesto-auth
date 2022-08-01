@@ -42,32 +42,46 @@ export default function App() {
   }
 
   function onRegister(email, password) {
-    return api.access(email, password, '/signup').then(res => {
-      if(!res.ok) {
-        setInfoMessage(false);
-      } else {
+    api.access(email, password, '/signup')
+    .then(res => {
+      if(res) {
         setInfoMessage(true);
+      }else{
+        setInfoShow(true);
+        setBntName('Регистрация');
       }
     })
-    .then(() => {
-      setInfoShow(true);
-      setBntName('Регистрация');
+    .catch((err) => {
+      setInfoMessage(false);
+      console.error(`Ошибка ${err} при регистрации.`);
     })
   }
 
   function getCards() {
     api.renderAllCards()
       .then(cards => {
-        setCards(cards.data)
+        setCards(cards)
       })
       .catch(err => console.error(`Ошибка ${err} при загрузке карточек.`))
     }
+
+  function checkToken() {
+    api.getCheckToken()
+    .then(res => {
+      if(res) {
+        setCurrentUser(res.data);
+        // auth();
+        getCards();
+    }
+    })
+    .catch(err => console.error(`Ошибка ${err} при проверке токена.`))
+  }
 
   function auth() {
     api.getUserInfo()
       .then((res) => {
         if(res) {
-          setCurrentUser(res.data);
+          console.log(res);
         }
       })
       .catch(err => console.error(`Ошибка ${err} при получении данных профиля.`));
@@ -76,8 +90,7 @@ export default function App() {
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if(jwt) {
-      auth();
-      getCards();
+      checkToken();
     }
   }, []);
 
@@ -117,7 +130,7 @@ export default function App() {
   function handleUpdateUser({name, about}, setBtnName) {
     api.sendData(name, about)
     .then((res) => {
-      setCurrentUser(res.data);
+      setCurrentUser(res);
       closeAllPopups();
     })
     .catch(err => console.error(`Ошибка ${err} при отправке данных профиля.`))
@@ -127,14 +140,15 @@ export default function App() {
   function handleUpdateAvatar({avatar}, setBtnName) {
     api.selectionAvatar(avatar)
     .then((res) => {
-      setCurrentUser(res.data);
+      setCurrentUser(res);
       closeAllPopups();
     })
     .catch(err => console.error(`Ошибка ${err} при получении аватара.`))
     .finally(() => {setBtnName('Сохранить')});
   }
 
-  function handleCardLike(card, isLiked) {
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(item => item._id === currentUser._id);
     api.handleLike(card._id, !isLiked)
       .then(сard => {
         setCards((state) => state.map((c) => c._id === card._id ? сard : c));
@@ -159,7 +173,7 @@ export default function App() {
   function handleAddPlaceSubmit({name, link}, setBtnName) {
     api.addCards({name: name, link: link})
     .then((newCard) => {
-      setCards([newCard.data, ...cards]);
+      setCards([newCard, ...cards]);
       closeAllPopups();
     })
     .catch(err => console.error(`Ошибка ${err} при добавлении карточки.`))
@@ -175,7 +189,7 @@ export default function App() {
             <Login onLogin={onLogin} setBntName={setBntName} />
           </Route>
           <Route path='/signup'>
-            <Register onRegister={onRegister} />
+            <Register onRegister={onRegister} setInfoMessage={setInfoMessage} />
           </Route>
 
           <ProtectedRoute loggedIn={loggedIn} path='/'
