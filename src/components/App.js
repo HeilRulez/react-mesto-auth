@@ -48,12 +48,15 @@ export default function App() {
         setInfoMessage(true);
       }else{
         setInfoShow(true);
-        setBntName('Регистрация');
+
       }
     })
     .catch((err) => {
       setInfoMessage(false);
       console.error(`Ошибка ${err} при регистрации.`);
+    })
+    .finally(() => {
+      setBntName('Регистрация');
     })
   }
 
@@ -201,9 +204,6 @@ export default function App() {
             onCardLike={handleCardLike}
             onCardDelete={handleDeletePopup}
             component={Main} />
-          <Route>
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
-          </Route>
         </Switch>
           <Footer />
 

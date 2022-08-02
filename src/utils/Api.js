@@ -1,9 +1,10 @@
 import * as cs from './constants.js';
 
 class Api {
-  constructor({baseUrl, authUrl, type, cohort}) {
+  constructor({baseUrl, authUrl, token, type, cohort}) {
     this._baseUrl = baseUrl;
     this._authUrl = authUrl;
+    this._token = token;
     this._type = type;
     this._cohort = cohort;
   }
@@ -19,7 +20,7 @@ class Api {
   renderAllCards() {
     return fetch(`${this._baseUrl}${this._cohort}/cards`, {
         headers: {
-          authorization: localStorage.getItem('jwt')
+          authorization: this._token
         }
       })
       .then(res => this._checkResponse(res))
@@ -28,7 +29,7 @@ class Api {
   getUserInfo() {
     return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
         headers: {
-          authorization: localStorage.getItem('jwt')
+          authorization: this._token
         }
       })
       .then(res => this._checkResponse(res))
@@ -38,7 +39,7 @@ class Api {
     return fetch(`${this._baseUrl}${this._cohort}/cards/${idCard}`, {
         method: 'DELETE',
         headers: {
-          authorization: localStorage.getItem('jwt')
+          authorization: this._token
         }
       })
       .then(res => this._checkResponse(res))
@@ -49,7 +50,7 @@ class Api {
     return fetch(`${this._baseUrl}${this._cohort}/cards`, {
         method: 'POST',
         headers: {
-          authorization: localStorage.getItem('jwt'),
+          authorization: this._token,
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -65,7 +66,7 @@ class Api {
       return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
           method: 'DELETE',
           headers: {
-            authorization: localStorage.getItem('jwt')
+            authorization: this._token
           }
         })
         .then(res => this._checkResponse(res))
@@ -73,7 +74,7 @@ class Api {
       return fetch(`${this._baseUrl}${this._cohort}/cards/${id}/likes`, {
           method: 'PUT',
           headers: {
-            authorization: localStorage.getItem('jwt')
+            authorization: this._token
           }
         })
         .then(res => this._checkResponse(res))
@@ -84,7 +85,7 @@ class Api {
     return fetch(`${this._baseUrl}${this._cohort}/users/me`, {
         method: 'PATCH',
         headers: {
-          authorization: localStorage.getItem('jwt'),
+          authorization: this._token,
           'Content-Type': this._type
         },
         body: JSON.stringify({
@@ -99,7 +100,7 @@ class Api {
     return fetch(`${this._baseUrl}${this._cohort}/users/me/avatar`, {
         method: 'PATCH',
         headers: {
-          authorization: localStorage.getItem('jwt'),
+          authorization: this._token,
           'Content-Type': this._type
         },
         body: JSON.stringify({

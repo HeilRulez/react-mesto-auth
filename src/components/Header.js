@@ -1,4 +1,4 @@
-import {useContext} from 'react';
+import {useContext, useEffect} from 'react';
 import {useHistory} from 'react-router-dom';
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
 
@@ -6,6 +6,12 @@ export default function Header ({loggedIn, setLoggedIn, bntName, setBntName}) {
 
   const currentUser = useContext(CurrentUserContext);
   const history = useHistory();
+
+  useEffect(() => {
+    console.log(loggedIn);
+  }, [loggedIn])
+
+
 
   function handleOut() {
     setLoggedIn(false);
