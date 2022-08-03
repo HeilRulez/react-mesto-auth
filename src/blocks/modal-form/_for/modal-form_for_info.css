@@ -10,6 +10,7 @@
   padding-bottom: 50px;
   box-sizing: border-box;
   white-space: pre-line;
+  text-align: center;
 }
 
 @media screen and (min-width: 560px) {

@@ -5,7 +5,6 @@ export default function Register({onRegister}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const history = useHistory();
 
   function handleChangeEmail(e) {
     setEmail(e.target.value);
@@ -28,7 +27,6 @@ export default function Register({onRegister}) {
     onRegister(email, password)
       .then(() => {
         resetForm();
-        history.push('/signin');
     })
   }
 
@@ -57,7 +55,7 @@ export default function Register({onRegister}) {
         </form>
         <p className="form__text">
           Уже зарегистрированы?
-          <Link className="form__link" to='/signin'> Войти</Link>
+          <Link className="form__link" to='/sign-in'> Войти</Link>
         </p>
       </div>
     )

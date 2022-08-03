@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react';
-import {Route, Switch, useHistory, Redirect} from 'react-router-dom';
+import {Route, Switch, useHistory} from 'react-router-dom';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -8,12 +8,12 @@ import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
-import ProtectedRoute from '../utils/ProtectedRoute';
+import ProtectedRoute from './ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
 import InfoTooltip from './InfoTooltip';
 import api from '../utils/Api';
-import {CurrentUserContext} from '../contexts/CurrentUserContext';
+import {CurrentUserContext, DataUserContext} from '../contexts/CurrentUserContext';
 
 export default function App() {
 
@@ -25,6 +25,7 @@ export default function App() {
   const [infoMessage, setInfoMessage] = useState(null);
   const [selectedCard, handleCardClick] = useState({});
   const [currentUser, setCurrentUser] = useState({});
+  const [dataUser, setDataUser] = useState({});
   const [cards, setCards] = useState([]);
   const [cardItem, setCardItem] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
@@ -42,21 +43,20 @@ export default function App() {
   }
 
   function onRegister(email, password) {
-    api.access(email, password, '/signup')
+    return api.access(email, password, '/signup')
     .then(res => {
       if(res) {
         setInfoMessage(true);
+        history.push('/sign-in');
       }else{
-        setInfoShow(true);
-
+        setInfoMessage(false);
       }
     })
     .catch((err) => {
-      setInfoMessage(false);
       console.error(`Ошибка ${err} при регистрации.`);
     })
     .finally(() => {
-      setBntName('Регистрация');
+      setInfoShow(true);
     })
   }
 
@@ -68,32 +68,31 @@ export default function App() {
       .catch(err => console.error(`Ошибка ${err} при загрузке карточек.`))
     }
 
+  function getInfo() {
+    api.getUserInfo()
+    .then((dataUser) => {
+      setCurrentUser(dataUser)
+      })
+      .catch(err => console.error(`Ошибка ${err} при получении данных профиля.`));
+  }
+
   function checkToken() {
     api.getCheckToken()
     .then(res => {
       if(res) {
-        setCurrentUser(res.data);
-        // auth();
+        setDataUser(res.data);
         getCards();
     }
     })
     .catch(err => console.error(`Ошибка ${err} при проверке токена.`))
   }
 
-  function auth() {
-    api.getUserInfo()
-      .then((res) => {
-        if(res) {
-          console.log(res);
-        }
-      })
-      .catch(err => console.error(`Ошибка ${err} при получении данных профиля.`));
-  }
-
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if(jwt) {
+      setLoggedIn(true);
       checkToken();
+      getInfo();
     }
   }, []);
 
@@ -174,51 +173,55 @@ export default function App() {
   }
 
   function handleAddPlaceSubmit({name, link}, setBtnName) {
-    api.addCards({name: name, link: link})
+    return api.getAllCards({name: name, link: link})
     .then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
     })
     .catch(err => console.error(`Ошибка ${err} при добавлении карточки.`))
-    .finally(() => {setBtnName('Создать')});
+    .finally(() => {
+      setBtnName('Создать')
+    });
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-    <div className="page">
-      <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} setBntName={setBntName} bntName={bntName} />
-        <Switch>
-          <Route path='/signin'>
-            <Login onLogin={onLogin} setBntName={setBntName} />
-          </Route>
-          <Route path='/signup'>
-            <Register onRegister={onRegister} setInfoMessage={setInfoMessage} />
-          </Route>
+  <CurrentUserContext.Provider value={currentUser}>
+    <DataUserContext.Provider value={dataUser}>
+      <div className="page">
+        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} setBntName={setBntName} bntName={bntName} />
+          <Switch>
+            <Route path='/sign-in'>
+              <Login onLogin={onLogin} setBntName={setBntName} />
+            </Route>
+            <Route path='/sign-up'>
+              <Register onRegister={onRegister} setInfoMessage={setInfoMessage} />
+            </Route>
 
-          <ProtectedRoute loggedIn={loggedIn} path='/'
-            onCardClick={handleCardClick}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            cards={cards}
-            onCardLike={handleCardLike}
-            onCardDelete={handleDeletePopup}
-            component={Main} />
-        </Switch>
-          <Footer />
+            <ProtectedRoute loggedIn={loggedIn} path='/'
+              onCardClick={handleCardClick}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              cards={cards}
+              onCardLike={handleCardLike}
+              onCardDelete={handleDeletePopup}
+              component={Main} />
+          </Switch>
+            <Footer />
 
-          <EditProfilePopup onUpdateUser={handleUpdateUser} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} />
+            <EditProfilePopup onUpdateUser={handleUpdateUser} isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} />
 
-          <AddPlacePopup onAddPlace={handleAddPlaceSubmit} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
+            <AddPlacePopup onAddPlace={handleAddPlaceSubmit} isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} />
 
-          <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
+            <EditAvatarPopup onUpdateAvatar={handleUpdateAvatar} isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} />
 
-          <DeletePopup onDeleteCard={handleCardDelete} isOpen={isDeletePopupOpen} onClose={closeAllPopups} card={cardItem} />
+            <DeletePopup onDeleteCard={handleCardDelete} isOpen={isDeletePopupOpen} onClose={closeAllPopups} card={cardItem} />
 
-          <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} info={infoMessage} />
+            <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} info={infoMessage} />
 
-          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
-  </div>
+            <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+    </div>
+    </DataUserContext.Provider>
   </CurrentUserContext.Provider>
   );
 }

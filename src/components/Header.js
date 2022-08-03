@@ -1,30 +1,24 @@
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 import {useHistory} from 'react-router-dom';
-import {CurrentUserContext} from '../contexts/CurrentUserContext';
+import {DataUserContext} from '../contexts/CurrentUserContext';
 
 export default function Header ({loggedIn, setLoggedIn, bntName, setBntName}) {
 
-  const currentUser = useContext(CurrentUserContext);
+  const dataUser = useContext(DataUserContext);
   const history = useHistory();
 
-  useEffect(() => {
-    console.log(loggedIn);
-  }, [loggedIn])
-
-
-
-  function handleOut() {
+  function onSignOut() {
     setLoggedIn(false);
     localStorage.removeItem('jwt');
-    history.push('/signin');
+    history.push('/sign-in');
   }
 
   function handleIn() {
     if(bntName === 'Войти') {
-      history.push('/signin');
+      history.push('/sign-in');
       setBntName('Регистрация');
     }else if(bntName === 'Регистрация') {
-      history.push('/signup');
+      history.push('/sign-up');
       setBntName('Войти');
     }
   }
@@ -32,8 +26,8 @@ export default function Header ({loggedIn, setLoggedIn, bntName, setBntName}) {
     return (
       <header className="header">
         <div className="header__logo"></div>
-        <p className="header__text">{loggedIn ? currentUser.email : ''}</p>
-        {loggedIn ?  (<button className="header__btn" onClick={handleOut}>Выйти</button>) : (<button className="header__btn" onClick={handleIn}>{bntName}</button>)}
+        <p className="header__text">{loggedIn ? dataUser.email : ''}</p>
+        {loggedIn ?  (<button className="header__btn" onClick={onSignOut}>Выйти</button>) : (<button className="header__btn" onClick={handleIn}>{bntName}</button>)}
 
       </header>
     )

@@ -34,11 +34,12 @@ function handleLink(e) {
         buttonText={btnName}>
           <input className="form__name form__name_for_addCard form__input"
             id="place" type="text" name="name" placeholder="Название"
-            minLength="2" maxLength="30" onChange={handleName} required autoComplete="off" />
+            volue={name} minLength="2" maxLength="30" onChange={handleName}
+            required autoComplete="off" />
           <span className="form__text-error" id="place-error"></span>
           <input className="form__data form__data_for_addCard form__input"
             id="adress" type="url" name="link" placeholder="Ссылка на картинку"
-            onChange={handleLink} required autoComplete="off" />
+            volue={link} onChange={handleLink} required autoComplete="off" />
           <span className="form__text-error" id="adress-error"></span>
       </PopupWithForm>
 
