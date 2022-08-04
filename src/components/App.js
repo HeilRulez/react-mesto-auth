@@ -37,6 +37,7 @@ export default function App() {
       .then(res => {
         if(res.token) {
           localStorage.setItem('jwt', res.token);
+          checkToken();
           setLoggedIn(true);
       }
     })
@@ -90,9 +91,9 @@ export default function App() {
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if(jwt) {
-      setLoggedIn(true);
       checkToken();
       getInfo();
+      setLoggedIn(true);
     }
   }, []);
 
