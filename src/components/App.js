@@ -22,7 +22,7 @@ export default function App() {
   const [isEditAvatarPopupOpen, setAvatarPopupOpen] = useState(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [isInfoShow, setInfoShow] = useState(false);
-  const [infoMessage, setInfoMessage] = useState(null);
+  const [infoState, setInfoState] = useState(null);
   const [selectedCard, handleCardClick] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [dataUser, setDataUser] = useState({});
@@ -47,10 +47,10 @@ export default function App() {
     return api.access(email, password, '/signup')
     .then(res => {
       if(res) {
-        setInfoMessage(true);
+        setInfoState(true);
         history.push('/sign-in');
       }else{
-        setInfoMessage(false);
+        setInfoState(false);
       }
     })
     .catch((err) => {
@@ -195,7 +195,7 @@ export default function App() {
               <Login onLogin={onLogin} setBntName={setBntName} />
             </Route>
             <Route path='/sign-up'>
-              <Register onRegister={onRegister} setInfoMessage={setInfoMessage} />
+              <Register onRegister={onRegister} />
             </Route>
 
             <ProtectedRoute loggedIn={loggedIn} path='/'
@@ -218,7 +218,7 @@ export default function App() {
 
             <DeletePopup onDeleteCard={handleCardDelete} isOpen={isDeletePopupOpen} onClose={closeAllPopups} card={cardItem} />
 
-            <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} info={infoMessage} />
+            <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} infoState={infoState} />
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
     </div>
