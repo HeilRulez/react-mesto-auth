@@ -23,13 +23,13 @@ export default function App() {
   const [isDeletePopupOpen, setDeletePopupOpen] = useState(false);
   const [isInfoShow, setInfoShow] = useState(false);
   const [infoState, setInfoState] = useState(null);
+  const [infoMessage, setInfoMessage] = useState('');
   const [selectedCard, handleCardClick] = useState({});
   const [currentUser, setCurrentUser] = useState({});
   const [dataUser, setDataUser] = useState({});
   const [cards, setCards] = useState([]);
   const [cardItem, setCardItem] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
-  const [bntName, setBntName] = useState('Войти');
   const history = useHistory();
 
   function onLogin(email, password) {
@@ -39,21 +39,29 @@ export default function App() {
           localStorage.setItem('jwt', res.token);
           checkToken();
           setLoggedIn(true);
-      }
-    })
+        }
+      })
+      .then(() => history.push('/'))
+      .catch(err => {
+        setInfoMessage('Неверные данные авторизации!\n Попробуйте ещё раз.');
+        setInfoState(false);
+        setInfoShow(true);
+        console.error(`Ошибка ${err} при попытке авторизации.`);
+      });
   }
 
   function onRegister(email, password) {
     return api.access(email, password, '/signup')
     .then(res => {
       if(res) {
+        setInfoMessage('Вы успешно\n зарегистрировались!');
         setInfoState(true);
         history.push('/sign-in');
-      }else{
-        setInfoState(false);
       }
     })
     .catch((err) => {
+      setInfoMessage('Что-то пошло не так!\n Попробуйте ещё раз.');
+      setInfoState(false);
       console.error(`Ошибка ${err} при регистрации.`);
     })
     .finally(() => {
@@ -80,10 +88,12 @@ export default function App() {
   function checkToken() {
     api.getCheckToken()
     .then(res => {
-      if(res) {
+      if(res.data._id) {
+        setLoggedIn(true);
         setDataUser(res.data);
         getCards();
-    }
+        getInfo();
+      }
     })
     .catch(err => console.error(`Ошибка ${err} при проверке токена.`))
   }
@@ -92,8 +102,6 @@ export default function App() {
     const jwt = localStorage.getItem('jwt');
     if(jwt) {
       checkToken();
-      getInfo();
-      setLoggedIn(true);
     }
   }, []);
 
@@ -102,7 +110,6 @@ export default function App() {
       history.push('/');
     }
   }, [loggedIn]);
-
 
   function closeAllPopups() {
     setAvatarPopupOpen(false);
@@ -189,10 +196,10 @@ export default function App() {
   <CurrentUserContext.Provider value={currentUser}>
     <DataUserContext.Provider value={dataUser}>
       <div className="page">
-        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} setBntName={setBntName} bntName={bntName} />
+        <Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
           <Switch>
             <Route path='/sign-in'>
-              <Login onLogin={onLogin} setBntName={setBntName} />
+              <Login onLogin={onLogin} />
             </Route>
             <Route path='/sign-up'>
               <Register onRegister={onRegister} />
@@ -218,7 +225,7 @@ export default function App() {
 
             <DeletePopup onDeleteCard={handleCardDelete} isOpen={isDeletePopupOpen} onClose={closeAllPopups} card={cardItem} />
 
-            <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} infoState={infoState} />
+            <InfoTooltip isOpen={isInfoShow} onClose={closeAllPopups} infoMessage={infoMessage} infoState={infoState} />
 
             <ImagePopup card={selectedCard} onClose={closeAllPopups} />
     </div>

@@ -1,15 +1,9 @@
-import { useEffect, useState } from "react";
-import {useHistory} from 'react-router-dom';
+import {useState} from "react";
 
-export default function Login({onLogin, setBntName}) {
+export default function Login({onLogin}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const history = useHistory();
-
-  useEffect(() => {
-    setBntName('Регистрация');
-  });
 
   function handleChangeEmail(e) {
     setEmail(e.target.value);
@@ -31,10 +25,8 @@ export default function Login({onLogin, setBntName}) {
     }
     onLogin(email, password)
     .then(() => {
-      history.push('/');
       resetForm();
     })
-    .catch(err => console.error(`Ошибка ${err} при попытке авторизации.`));
   }
 
     return (
